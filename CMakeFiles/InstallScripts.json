@@ -1,0 +1,8 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/northh/repos/lvgl_vscode/cmake_install.cmake",
+		"C:/northh/repos/lvgl_vscode/lvgl/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

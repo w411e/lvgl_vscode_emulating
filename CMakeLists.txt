@@ -37,7 +37,7 @@ endif()
 include_directories(${PROJECT_SOURCE_DIR}/main/inc)
 
 # Define options for LVGL with default values (OFF)
-option(LV_USE_DRAW_SDL "Use SDL draw unit" OFF)
+option(LV_USE_DRAW_SDL "Use SDL draw unit" ON)
 option(LV_USE_LIBPNG "Use libpng to decode PNG" OFF)
 option(LV_USE_LIBJPEG_TURBO "Use libjpeg turbo to decode JPEG" OFF)
 option(LV_USE_FFMPEG "Use libffmpeg to display video using lv_ffmpeg" OFF)
@@ -53,6 +53,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
 # Find and include SDL2 library
+set(SDL2_DIR "C:/northh/repos/vcpkg/installed/x64-mingw-dynamic/share/sdl2")
 find_package(SDL2 REQUIRED)
 
 # Add compile definitions based on the selected options
@@ -85,12 +86,25 @@ endif()
 add_custom_target(run COMMAND ${EXECUTABLE_OUTPUT_PATH}/main DEPENDS main)
 
 # Conditionally include and link SDL2_image if LV_USE_DRAW_SDL is enabled
+# if(LV_USE_DRAW_SDL)
+#     #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+#     set(CMAKE_TOOLCHAIN_FILE "C:/northh/repos/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+#     find_package(SDL2 CONFIG REQUIRED)
+#     find_package(SDL2_image CONFIG REQUIRED)
+#     target_include_directories(lvgl PUBLIC ${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
+#     list(APPEND MAIN_LIBS ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
+# endif()
+# Conditionally include and link SDL2_image if LV_USE_DRAW_SDL is enabled
 if(LV_USE_DRAW_SDL)
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+    set(CMAKE_TOOLCHAIN_FILE "C:/northh/repos/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain fil")
+    find_package(SDL2 REQUIRED)
+    set(SDL2_image_DIR "C:/northh/repos/vcpkg/installed/x64-mingw-dynamic/share/SDL2_image")
     find_package(SDL2_image REQUIRED)
-    target_include_directories(lvgl PUBLIC ${SDL2_IMAGE_INCLUDE_DIRS})
-    list(APPEND MAIN_LIBS ${SDL2_IMAGE_LIBRARIES})
+    target_include_directories(lvgl PUBLIC ${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
+    list(APPEND MAIN_LIBS ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
 endif()
+
+
 
 # Conditionally include and link libpng if LV_USE_LIBPNG is enabled
 if(LV_USE_LIBPNG)
