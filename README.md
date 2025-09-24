@@ -1,5 +1,5 @@
 # Changes that made it work for me
-I made some changes to make this repo run on my vscode on Win10. 
+I made some changes to make this repo run on my vscode on Win10. this repo is used by me for testing. if i find bugs in the original code i made put them through to the original. but for clean version download from original repo!!!
 **TBD**
 
 # VSCode Simulator project for LVGL
