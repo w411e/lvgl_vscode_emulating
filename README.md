@@ -1,3 +1,7 @@
+# Changes that made it work for me
+I made some changes to make this repo run on my vscode on Win10. 
+**TBD**
+
 # VSCode Simulator project for LVGL
 
 [LVGL](https://github.com/lvgl/lvgl) is written mainly for microcontrollers and embedded systems, however you can run the library **on your PC** as well without any embedded hardware. The code written on PC can be simply copied when your are using an embedded system.
