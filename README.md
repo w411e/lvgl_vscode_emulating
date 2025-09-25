@@ -1,3 +1,22 @@
+- [Changes that made it work for me](#changes-that-made-it-work-for-me)
+  - [Changes](#changes)
+- [VSCode Simulator project for LVGL](#vscode-simulator-project-for-lvgl)
+  - [Get started](#get-started)
+    - [Install SDL and the build tools](#install-sdl-and-the-build-tools)
+    - [Get the PC project](#get-the-pc-project)
+  - [Usage](#usage)
+    - [Visual Studio Code](#visual-studio-code)
+      - [ArchLinux User](#archlinux-user)
+      - [macOS](#macos)
+    - [FreeRTOS configuration](#freertos-configuration)
+    - [Enable FreeRTOS](#enable-freertos)
+    - [CMake](#cmake)
+  - [Run demos and examples](#run-demos-and-examples)
+  - [Optional library](#optional-library)
+    - [Linux](#linux)
+    - [(RT)OS support](#rtos-support)
+  - [Test](#test)
+
 # Changes that made it work for me
 I made some changes to make this repo run on my vscode on Win10. this repo is used by me for testing. if i find bugs in the original code i made put them through to the original. but for clean version download from original repo!!!
 
@@ -22,12 +41,12 @@ I am a student and try to get into these subjects, so some of my changes might s
 - Changes to my tasks.json, to have it build and compile with `<`Ctrl`>` + `<`Shift`>` + `<`B`>` and start debugging with `<`F5`>`
 - It is important to either install every package with vcpkg or Msys2, they each use and create different paths and compiling won't work, if not done consistent.
 - I added pointers for the SDL2 packages in CMakeLists.txt
-```
+~~~ CMake
 #Find and include SDL2 library"
 set(SDL2_DIR "C:/your-path/vcpkg/installed/x64-mingw-dynamic/share/sdl2")
-``` 
+~~~
 - I changed the SDL2 image link
-```
+~~~ CMake
 if(LV_USE_DRAW_SDL)
   set(CMAKE_TOOLCHAIN_FILE "C:/yourpath/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain fil")
   find_package(SDL2 REQUIRED)
@@ -36,7 +55,7 @@ if(LV_USE_DRAW_SDL)
   target_include_directories(lvgl PUBLIC ${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
   list(APPEND MAIN_LIBS ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
 endif()
-```
+~~~
 
 # VSCode Simulator project for LVGL
 
