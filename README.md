@@ -18,7 +18,10 @@
 
 # Restults lv_init Properties
 
-**TBD**
+1. .
+2. .
+3. FPS Monitor:
+   1. ![FPS monitored in example program.](/screenshots/FPS-Test.PNG?raw=true "FPS Monitor")
 
 # Results sdl_hal_init()
 
