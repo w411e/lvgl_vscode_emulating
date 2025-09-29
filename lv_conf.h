@@ -313,7 +313,7 @@
 #define LV_USE_DRAW_DAVE2D 0
 
 /** Draw using cached SDL textures*/
-#define LV_USE_DRAW_SDL 1 // TESTCASE
+#define LV_USE_DRAW_SDL 0 // TESTCASE
 
 /** Use VG-Lite GPU. */
 #define LV_USE_DRAW_VG_LITE 0
@@ -1049,7 +1049,7 @@
 
     /** 1: Show CPU usage and FPS count.
      *  - Requires `LV_USE_SYSMON = 1` */
-    #define LV_USE_PERF_MONITOR 1 // TESTCASE
+    #define LV_USE_PERF_MONITOR 0 // TESTCASE
     #if LV_USE_PERF_MONITOR
         #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
 
