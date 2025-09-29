@@ -21,8 +21,10 @@
 1. .
 2. .
 3. FPS Monitor:
-   1. In lv_conf.h set LV_USE_SYSMON and LV_USE_PERF_MONITOR to '1'.  ![FPS monitored in example program.](/screenshots/FPS-Monitor.PNG?raw=true "FPS Monitor")
-   2. as 1. but also set LV_USE_MEM_MONITOR to '1'. Make sure you dont change the STDLIB setting, to use LVGL's.  ![RAM usage monitored in example program.](/screenshots/RAM-Monitor.PNG?raw=true "RAM Monitor")
+   1. In lv_conf.h set LV_USE_SYSMON and LV_USE_PERF_MONITOR to '1'.  
+   ![FPS monitored in example program.](/screenshots/FPS-Monitor.PNG?raw=true "FPS Monitor")
+   2. as 1. but also set LV_USE_MEM_MONITOR to '1'. Make sure you dont change the STDLIB setting, to use LVGL's.  
+   ![RAM usage monitored in example program.](/screenshots/RAM-Monitor.PNG?raw=true "RAM Monitor")
 # Results sdl_hal_init()
 
 **TBD**
