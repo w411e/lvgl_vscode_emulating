@@ -67,7 +67,7 @@ int main(int argc, char **argv)
   /* To try a different demo or example, replace this with one of: */
   /* - lv_demo_benchmark(); */
   /* - lv_demo_stress(); */
-  /* - lv_example_label_1(); */
+  /* lv_example_label_1(); */
   /* - etc. */
   lv_demo_widgets();
 
@@ -78,11 +78,11 @@ int main(int argc, char **argv)
     if(sleep_time_ms == LV_NO_TIMER_READY){
 	    sleep_time_ms =  LV_DEF_REFR_PERIOD;
     }
-#ifdef _MSC_VER
-    Sleep(sleep_time_ms);
-#else
-    usleep(sleep_time_ms * 1000);
-#endif
+    #ifdef _MSC_VER
+      Sleep(sleep_time_ms);
+    #else
+      usleep(sleep_time_ms * 1000);
+    #endif
   }
 
   return 0;
