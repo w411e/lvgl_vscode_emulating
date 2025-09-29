@@ -7,10 +7,10 @@ Disclaimer: If not added yet, the tests are sololy done on windows with mingw64,
 <summary><b>Testcases:</b></summary>
 
 1. [x]lv_draw_sw_init(): complex vs. simple drawing
-2. [x]SDL: active vs. non-active (further testing needed)
+2. [x]SDL: active vs. non-active
 3. [x]lv_sysmon_builtin_init(): Performance testing
-4. [x]Builtin memory tests: Performance testing with/without (further testing needed)
-5. [x]Cache size: Performance testing (further testing needed)
+4. [x]Builtin memory tests: Performance testing with/without
+5. [x]Cache size: Performance testing
 
 </details>
 
@@ -29,7 +29,7 @@ Values in order: used kB abs., used kB rel., used kB max. abs., fragmentation us
 
 </details>
 <details>
-<summary><b>Testoutcomes lv_demo_widgets and Conclusions:</b></summary>
+<summary><b>Testoutcomes lv_demo_widgets:</b></summary>
 
 | Testcase | Outcome |
 |:---------|:--------|
@@ -40,7 +40,7 @@ Values in order: used kB abs., used kB rel., used kB max. abs., fragmentation us
 
 </details>
 <details>
-<summary><b>Testoutcome Screenshots Benchmark</b></summary><br>
+<summary><b>Testoutcome lv_demo_benchmark:</b></summary><br>
 
 **INFO**: LV_DRAW_SW_COMPLEX remains unchanged in both runs due to comiling problems, settingchanges below  
 
@@ -49,12 +49,13 @@ Values in order: used kB abs., used kB rel., used kB max. abs., fragmentation us
 | - LV_USE_ASSER_... STYLE, MEM_INTEGRITY, OBJ = 1<br> - LV_FS_STDIO_CACHE_SIZE 0 |  - LV_USE_ASSER_... STYLE, MEM_INTEGRITY, OBJ = 1<br> - LV_FS_STDIO_CACHE_SIZE 1024 |
 | <img src="./screenshots/Benchmark-Default-Settings.PNG" alt="Testresults for lv_demo_benchmark with default out of the box settings" title="Benchmark Default" width="400"/> | <img src="./screenshots/Benchmark-Optimized-Settings.PNG" alt="Testresults for lv_demo_benchmark with optimized settings" title="Benchmark Optimized" width="400"/> |  
 
-**Conclusion**: The optimizations using the settingchanges shown above are having a huge impact on the overall CPU-usage and a minor impact on the FPS. The most ressource-intensive-task "Widgets demo" has 20%-points less average CPU usage and 2 FPS more in optimized mode. Overall all tests benefit from the optimization by using up to 50% less CPU capabilities in optimized mode. However there is one outlier with "Moving wallpaper". The Test uses 2%-points more in optimized mode than in default.<br>
-Testing with no cache for lv_fs_read() mostly had a negative impact on the performance, especially with the tests "Containers with opa_layer", in a small sample of tests the missing cache resulted in a performance boost e.g. "Moving wallpaper" or "Containers with overlay". Depending on the usecase, this is good to keep in mind and implement either as a toggle option for runtime operations or do other optimizations where a lv_fs_read-cache is usefull or not.
+**Conclusion**: The optimizations using the settingchanges shown above are having a huge impact on the overall CPU-usage and a minor impact on the FPS. The most ressource-intensive-task "Widgets demo" has 20%-points less average CPU usage and 2 FPS more in optimized mode. Overall all tests benefit from the optimization by using up to 50% less CPU capabilities in optimized mode. However there is one outlier with "Moving wallpaper". The Test uses 2%-points more in optimized mode than in default.<br><br>
+Testing with **no cache for lv_fs_read()** mostly had a negative impact on the performance, especially with the tests "Containers with opa_layer", in a small sample of tests the missing cache resulted in a performance boost e.g. "Moving wallpaper" or "Containers with overlay". Depending on the usecase, this is good to keep in mind and implement either as a toggle option for runtime operations or do other optimizations where a lv_fs_read-cache is usefull or not.<br><br>
+Turning off **SDL for the default benchmark** had a negative impact on the images tests like "Multiple rectangles" or "Multiple ARGB images", where the "Multiple rectangles"-test had a CPU-usage of 23% instead of 10%-default or 6%-optimized. The other image-tests where in the same magnitude.
 
 </details>
 
-## Testing sdl_hal_init() tbd
+## Testing sdl_hal_init()
 
 <details>
 <summary><b>Testcases:</b></summary>
