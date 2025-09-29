@@ -6,8 +6,8 @@
 1. [x]lv_draw_sw_init(): complex vs. simple drawing
 2. [x]SDL: active vs. non-active (further testing needed)
 3. [x]lv_sysmon_builtin_init(): Performance testing
-4. [x]Builtin memory tests: Performance testing with/without
-5. [ ]Cache size: Performance testing, maybe
+4. [x]Builtin memory tests: Performance testing with/without (further testing needed)
+5. [x]Cache size: Performance testing (further testing needed)
 
 </details>
 
