@@ -49,7 +49,7 @@ Values in order: used kB abs., used kB rel., used kB max. abs., fragmentation us
 | - LV_USE_ASSER_... STYLE, MEM_INTEGRITY, OBJ = 1<br> - LV_FS_STDIO_CACHE_SIZE 0 |  - LV_USE_ASSER_... STYLE, MEM_INTEGRITY, OBJ = 1<br> - LV_FS_STDIO_CACHE_SIZE 1024 |
 | <img src="./screenshots/Benchmark-Default-Settings.PNG" alt="Testresults for lv_demo_benchmark with default out of the box settings" title="Benchmark Default" width="400"/> | <img src="./screenshots/Benchmark-Optimized-Settings.PNG" alt="Testresults for lv_demo_benchmark with optimized settings" title="Benchmark Optimized" width="400"/> |  
 
-**Condlusion**: The optimizations using the settingchanges shown above are having a huge impact on the overall CPU-usage and a minor impact on the FPS. The most ressource-intensive-task "Widgets demo" has 20%-points less average CPU usage and 2 FPS more in optimized mode. Overall all tests benefit from the optimization by using up to 50% less CPU capabilities in optimized mode. However there is one outlier with "Moving wallpaper". The Test uses 2%-points more in optimized mode than in default.<br>
+**Conclusion**: The optimizations using the settingchanges shown above are having a huge impact on the overall CPU-usage and a minor impact on the FPS. The most ressource-intensive-task "Widgets demo" has 20%-points less average CPU usage and 2 FPS more in optimized mode. Overall all tests benefit from the optimization by using up to 50% less CPU capabilities in optimized mode. However there is one outlier with "Moving wallpaper". The Test uses 2%-points more in optimized mode than in default.<br>
 Testing with no cache for lv_fs_read() mostly had a negative impact on the performance, especially with the tests "Containers with opa_layer", in a small sample of tests the missing cache resulted in a performance boost e.g. "Moving wallpaper" or "Containers with overlay". Depending on the usecase, this is good to keep in mind and implement either as a toggle option for runtime operations or do other optimizations where a lv_fs_read-cache is usefull or not.
 
 </details>
@@ -59,15 +59,20 @@ Testing with no cache for lv_fs_read() mostly had a negative impact on the perfo
 <details>
 <summary><b>Testcases:</b></summary>
 
-1. [ ]SDL_GetTicks (duration 49 days) vs. SDL_GetTicks64: 64 recommended, might not work
-2. [ ]lv_display_create: Performance/Visual testing
-      1. [ ]LV_DPI_DEF
-      2. [ ]Antialiazing
-      3. [ ]Color depth
+1. [x]SDL_GetTicks (duration 49 days) vs. SDL_GetTicks64: 64 recommended, might not work
+2. [x]lv_display_create: Performance/Visual testing
+      1. [x]LV_DPI_DEF
+      2. [x]Antialiazing
+      3. [x]Color depth
 
 </details>
 
 
 ## Results sdl_hal_init()
 
-**TBD**
+**SDL_GetTicks vs SDL_GetTicks64**: Switching from the default Ticks-function to the 64 version is not possible without significant changes.  
+
+**lv_display_create**:
+1. DPI, just changes visual appearance and can be modified for custom spaces between widgets and sizes.
+2. Toggling the antialiazing setting didnt have a visual effect on the benchmark-test. It also had no impact on performance.
+3. Color depth is built into different parts of the code and can't be modified without significant changes.
