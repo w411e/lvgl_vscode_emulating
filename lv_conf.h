@@ -202,9 +202,9 @@
     /**
      * - 0: Use a simple renderer capable of drawing only simple rectangles with gradient, images, text, and straight lines only.
      * - 1: Use a complex renderer capable of drawing rounded corners, shadow, skew lines, and arcs too. */
-    #define LV_DRAW_SW_COMPLEX          1
+    #define LV_DRAW_SW_COMPLEX          1 // TESTCASE
 
-    #if LV_DRAW_SW_COMPLEX == 1
+    #if LV_DRAW_SW_COMPLEX == 1 // TESTCASE
         /** Allow buffering some shadow calculation.
          *  LV_DRAW_SW_SHADOW_CACHE_SIZE is the maximum shadow size to buffer, where shadow size is
          *  `shadow_width + radius`.  Caching has LV_DRAW_SW_SHADOW_CACHE_SIZE^2 RAM cost. */
@@ -313,7 +313,7 @@
 #define LV_USE_DRAW_DAVE2D 0
 
 /** Draw using cached SDL textures*/
-#define LV_USE_DRAW_SDL 0
+#define LV_USE_DRAW_SDL 1 // TESTCASE
 
 /** Use VG-Lite GPU. */
 #define LV_USE_DRAW_VG_LITE 0
@@ -433,9 +433,9 @@
  * If LV_USE_LOG is enabled, an error message will be printed on failure. */
 #define LV_USE_ASSERT_NULL          1   /**< Check if the parameter is NULL. (Very fast, recommended) */
 #define LV_USE_ASSERT_MALLOC        1   /**< Checks is the memory is successfully allocated or no. (Very fast, recommended) */
-#define LV_USE_ASSERT_STYLE         1
-#define LV_USE_ASSERT_MEM_INTEGRITY 1
-#define LV_USE_ASSERT_OBJ           1
+#define LV_USE_ASSERT_STYLE         1 // TESTCASE
+#define LV_USE_ASSERT_MEM_INTEGRITY 1 // TESTCASE
+#define LV_USE_ASSERT_OBJ           1 // TESTCASE
 
 /** Add a custom handler when assert happens e.g. to restart MCU. */
 #define LV_ASSERT_HANDLER_INCLUDE <stdint.h>
@@ -869,7 +869,7 @@
 #if LV_USE_FS_STDIO
     #define LV_FS_STDIO_LETTER 'A'
     #define LV_FS_STDIO_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
-    #define LV_FS_STDIO_CACHE_SIZE 0    /**< >0 to cache this number of bytes in lv_fs_read() */
+    #define LV_FS_STDIO_CACHE_SIZE 512    /**< >0 to cache this number of bytes in lv_fs_read() */
 #endif
 
 /** API for open, read, etc. */
@@ -1049,7 +1049,7 @@
 
     /** 1: Show CPU usage and FPS count.
      *  - Requires `LV_USE_SYSMON = 1` */
-    #define LV_USE_PERF_MONITOR 0
+    #define LV_USE_PERF_MONITOR 1 // TESTCASE
     #if LV_USE_PERF_MONITOR
         #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
 
@@ -1060,7 +1060,7 @@
     /** 1: Show used memory and memory fragmentation.
      *     - Requires `LV_USE_STDLIB_MALLOC = LV_STDLIB_BUILTIN`
      *     - Requires `LV_USE_SYSMON = 1`*/
-    #define LV_USE_MEM_MONITOR 0
+    #define LV_USE_MEM_MONITOR 1
     #if LV_USE_MEM_MONITOR
         #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
     #endif
