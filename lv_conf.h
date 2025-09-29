@@ -869,7 +869,7 @@
 #if LV_USE_FS_STDIO
     #define LV_FS_STDIO_LETTER 'A'
     #define LV_FS_STDIO_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
-    #define LV_FS_STDIO_CACHE_SIZE 0    /**< >0 to cache this number of bytes in lv_fs_read() */
+    #define LV_FS_STDIO_CACHE_SIZE 0    /**< >0 to cache this number of bytes in lv_fs_read() TESTCASE */
 #endif
 
 /** API for open, read, etc. */
@@ -1413,7 +1413,7 @@
     #endif
 
     /** Vector graphic demo */
-    #define LV_USE_DEMO_VECTOR_GRAPHIC  0
+    #define LV_USE_DEMO_VECTOR_GRAPHIC  1
 
     /** GLTF demo */
     #define LV_USE_DEMO_GLTF            0
@@ -1441,7 +1441,7 @@
     #endif
 
     /** High-resolution demo */
-    #define LV_USE_DEMO_HIGH_RES        0
+    #define LV_USE_DEMO_HIGH_RES        1
 
     /* Smart watch demo */
     #define LV_USE_DEMO_SMARTWATCH      0
