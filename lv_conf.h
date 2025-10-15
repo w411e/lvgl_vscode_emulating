@@ -313,7 +313,7 @@
 #define LV_USE_DRAW_DAVE2D 0
 
 /** Draw using cached SDL textures*/
-#define LV_USE_DRAW_SDL 0
+#define LV_USE_DRAW_SDL 1
 
 /** Use VG-Lite GPU. */
 #define LV_USE_DRAW_VG_LITE 0
@@ -497,7 +497,7 @@
 #define LV_USE_OBJ_ID           0
 
 /**  Enable support widget names*/
-#define LV_USE_OBJ_NAME         0
+#define LV_USE_OBJ_NAME         1
 
 /** Automatically assign an ID when obj is created */
 #define LV_OBJ_ID_AUTO_ASSIGN   LV_USE_OBJ_ID
@@ -1127,7 +1127,7 @@
 #endif
 
 /** 1: Enable Monkey test */
-#define LV_USE_MONKEY 0
+#define LV_USE_MONKEY 1
 
 /** 1: Enable grid navigation */
 #define LV_USE_GRIDNAV 0
@@ -1179,13 +1179,17 @@
 
 #endif
 
+/*==================
+ * TESTS
+ *==================*/
+
 /** Enable emulated input devices, time emulation, and screenshot compares. */
-#define LV_USE_TEST 0
+#define LV_USE_TEST 1
 #if LV_USE_TEST
 
 /** Enable `lv_test_screenshot_compare`.
  * Requires libpng and a few MB of extra RAM. */
-#define LV_USE_TEST_SCREENSHOT_COMPARE 0
+#define LV_USE_TEST_SCREENSHOT_COMPARE 1
 #endif /*LV_USE_TEST*/
 
 /** Enable loading XML UIs runtime */
@@ -1195,7 +1199,7 @@
 #define LV_USE_TRANSLATION 0
 
 /*1: Enable color filter style*/
-#define LV_USE_COLOR_FILTER     0
+#define LV_USE_COLOR_FILTER     1
 
 /*==================
  * DEVICES
@@ -1371,7 +1375,7 @@
 *======================*/
 
 /** Enable examples to be built with the library. */
-#define LV_BUILD_EXAMPLES 1
+#define LV_BUILD_EXAMPLES 0
 
 /** Build the demos */
 #define LV_BUILD_DEMOS 1
