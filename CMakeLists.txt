@@ -46,10 +46,15 @@ endif()
 # Main include files of the project
 include_directories(${PROJECT_SOURCE_DIR}/main/inc)
 
+# Disable LVGL demos/examples and ThorVG
+set(LVGL_BUILD_DEMOS OFF CACHE BOOL "Disable LVGL demos" FORCE)
+set(LVGL_BUILD_EXAMPLES OFF CACHE BOOL "Disable LVGL examples" FORCE)
+# set(LV_USE_TORVG OFF CACHE BOOL "Disable ThorVG" FORCE)
+
 # Define options for LVGL with default values (OFF)
 option(LV_USE_DRAW_SDL "Use SDL draw unit" OFF)
-option(LV_USE_LIBPNG "Use libpng to decode PNG" OFF)
-option(LV_USE_LIBJPEG_TURBO "Use libjpeg turbo to decode JPEG" OFF)
+option(LV_USE_LIBPNG "Use libpng to decode PNG" ON)
+option(LV_USE_LIBJPEG_TURBO "Use libjpeg turbo to decode JPEG" ON)
 option(LV_USE_FFMPEG "Use libffmpeg to display video using lv_ffmpeg" OFF)
 option(LV_USE_FREETYPE "Use freetype library" OFF)
 
@@ -94,9 +99,15 @@ set(TEST_SOURCES
     # Optionally include your app sources if you want to test the UI code directly
     src/mouse_cursor_icon.c
     src/hal/hal.c
+    src/testcode.c
+    lvgl/src/others/test/lv_test_display.c
+    lvgl/src/others/test/lv_test_indev.c
+    lvgl/src/others/test/lv_test_screenshot_compare.c
 )
-set(MAIN_LIBS lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES})
-set(TEST_LIBS lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES})
+# set(MAIN_LIBS lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES})
+# set(TEST_LIBS lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES})
+set(MAIN_LIBS lvgl lvgl::thorvg ${SDL2_LIBRARIES})
+set(TEST_LIBS lvgl lvgl::thorvg ${SDL2_LIBRARIES})
 
 # Create the main executable, depending on the FreeRTOS option
 if(USE_FREERTOS)
@@ -141,16 +152,26 @@ if(LV_USE_DRAW_SDL)
     find_package(SDL2_image REQUIRED)
     target_include_directories(lvgl PUBLIC ${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
     list(APPEND MAIN_LIBS ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
+    list(APPEND TEST_LIBS ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
 endif()
 
 
 
 # Conditionally include and link libpng if LV_USE_LIBPNG is enabled
 if(LV_USE_LIBPNG)
+    # Ensure vcpkg toolchain file is used (if not already)
+    if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+        set(CMAKE_TOOLCHAIN_FILE "C:/northh/repos/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+    endif()
     find_package(PNG REQUIRED)
-    target_include_directories(lvgl PUBLIC ${PNG_INCLUDE_DIRS})
-    list(APPEND MAIN_LIBS ${PNG_LIBRARIES})
-    list(APPEND TEST_LIBS ${PNG_LIBRARIES})
+    if(PNG_FOUND)
+        message(STATUS "libpng found: ${PNG_LIBRARIES}")
+        target_include_directories(lvgl PUBLIC ${PNG_INCLUDE_DIRS})
+        list(APPEND MAIN_LIBS ${PNG_LIBRARIES})
+        list(APPEND TEST_LIBS ${PNG_LIBRARIES})
+    else()
+        message(FATAL_ERROR "libpng not found!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    endif()
 endif()
 
 # Conditionally include and link libjpeg-turbo if LV_USE_LIBJPEG_TURBO is enabled

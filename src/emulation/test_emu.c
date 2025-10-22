@@ -69,6 +69,27 @@ void test_emulation_setup(void)
     lv_obj_center(lab2);
     lv_obj_center(lab3);
     lv_obj_center(lab4);
+    // Disable automatic resizing / style transitions on press/focus
+    lv_obj_clear_flag(btn1, LV_OBJ_FLAG_PRESS_LOCK);
+    lv_obj_clear_flag(btn2, LV_OBJ_FLAG_PRESS_LOCK);
+    lv_obj_clear_flag(btn3, LV_OBJ_FLAG_PRESS_LOCK);
+    lv_obj_clear_flag(btn4, LV_OBJ_FLAG_PRESS_LOCK);
+    // Prevent any layout resizing effects
+    lv_obj_set_style_transform_width(btn1, 0, LV_STATE_PRESSED);
+    lv_obj_set_style_transform_height(btn1, 0, LV_STATE_PRESSED);
+    lv_obj_set_style_pad_all(btn1, 5, LV_STATE_PRESSED);
+
+    lv_obj_set_style_transform_width(btn2, 0, LV_STATE_PRESSED);
+    lv_obj_set_style_transform_height(btn2, 0, LV_STATE_PRESSED);
+    lv_obj_set_style_pad_all(btn2, 5, LV_STATE_PRESSED);
+
+    lv_obj_set_style_transform_width(btn3, 0, LV_STATE_PRESSED);
+    lv_obj_set_style_transform_height(btn3, 0, LV_STATE_PRESSED);
+    lv_obj_set_style_pad_all(btn3, 5, LV_STATE_PRESSED);
+
+    lv_obj_set_style_transform_width(btn4, 0, LV_STATE_PRESSED);
+    lv_obj_set_style_transform_height(btn4, 0, LV_STATE_PRESSED);
+    lv_obj_set_style_pad_all(btn4, 5, LV_STATE_PRESSED);
     // events
     lv_obj_add_event_cb(btn1, btn_event_cb_1, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(btn2, btn_event_cb_1, LV_EVENT_ALL, NULL);

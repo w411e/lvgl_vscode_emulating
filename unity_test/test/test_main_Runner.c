@@ -3,21 +3,19 @@
 /*=======Automagically Detected Files To Include=====*/
 #include "unity.h"
 #include "src/emulation/test_emu.h"
-#include "lvgl/lvgl.h"
-
-/*=======Structure Used By Test Runner=====*/
-struct UnityRunTestParameters
-{
-  UnityTestFunction func;
-  const char* name;
-  UNITY_LINE_TYPE line_num;
-};
+#include "lvgl.h"
+#include "lvgl/src/others/test/lv_test_display.h"
+#include "lvgl/src/misc/lv_timer.h"
+#include "lvgl/src/others/test/lv_test_indev.h"
+#include "lvgl/src/others/test/lv_test_screenshot_compare.h"
+#include "lvgl/src/others/test/lv_test_helpers.h"
+#include <time.h>
 
 /*=======External Functions This Runner Calls=====*/
 extern void setUp(void);
 extern void tearDown(void);
-extern void test_buttons_created(void);
-extern void test_button_event_cb(void);
+extern void test_testscreen(void);
+extern void test_monkey_random_input(void);
 
 
 /*=======Mock Management=====*/
@@ -51,7 +49,7 @@ void verifyTest(void)
 static void run_test(UnityTestFunction func, const char* name, UNITY_LINE_TYPE line_num)
 {
     Unity.CurrentTestName = name;
-    Unity.CurrentTestLineNumber = (UNITY_UINT) line_num;
+    Unity.CurrentTestLineNumber = line_num;
 #ifdef UNITY_USE_COMMAND_LINE_ARGS
     if (!UnityTestMatches())
         return;
@@ -78,22 +76,9 @@ static void run_test(UnityTestFunction func, const char* name, UNITY_LINE_TYPE l
 /*=======MAIN=====*/
 int main(void)
 {
-  UnityBegin(".\\test\\test_main.c");
+  UnityBegin("test_main.c");
+  run_test(test_testscreen, "test_testscreen", 105);
+  run_test(test_monkey_random_input, "test_monkey_random_input", 180);
 
-  int number_of_tests = 2;
-  struct UnityRunTestParameters run_test_params_arr[number_of_tests];
-
-  run_test_params_arr[0].func = test_buttons_created;
-  run_test_params_arr[0].name = "test_buttons_created";
-  run_test_params_arr[0].line_num = 13;
-  run_test_params_arr[1].func = test_button_event_cb;
-  run_test_params_arr[1].name = "test_button_event_cb";
-  run_test_params_arr[1].line_num = 23;
-
-  for (int i = 0; i < number_of_tests; i++)
-  {
-    run_test(run_test_params_arr[i].func, run_test_params_arr[i].name, run_test_params_arr[i].line_num);
-  }
-
-  return UNITY_END();
+  return UnityEnd();
 }
