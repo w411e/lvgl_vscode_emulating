@@ -19,8 +19,9 @@ extern "C" {
 // globals
 
 // headers
-void btn_event_cb_empty(lv_event_t * e);
-void btn_event_cb_1(lv_event_t * e);
+void v_event_btn_main_bottom(lv_event_t * e);
+void v_event_btn_main_bg(lv_event_t * e);
+void v_btn_redraw(v_btn_enum_main_bottom_t btn_id);
 
 #ifdef __cplusplus
 } /*extern "C"*/

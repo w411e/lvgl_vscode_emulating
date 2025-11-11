@@ -4,12 +4,13 @@ project(lvgl C CXX)
 # Set the correct FreeRTOS port for your system (e.g., Posix for WSL)
 set(FREERTOS_PORT GCC_POSIX CACHE STRING "Port for FreeRTOS on Posix environment")
 
-option(TEST "Build Unity test executable instead of normal app" ON)
+option(TEST "Build Unity test executable instead of normal app" OFF)
 # Unit testing with Unity
 if(TEST)
     message(STATUS "Unity test is enabled")
     add_definitions(-DTEST=1)
 else()
+    message(STATUS "Unity test is disabled")
     add_definitions(-DTEST=0)
 endif()
 

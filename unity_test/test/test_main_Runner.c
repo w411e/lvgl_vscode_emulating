@@ -2,6 +2,7 @@
 
 /*=======Automagically Detected Files To Include=====*/
 #include "unity.h"
+#include "../../lvgl/src/lv_conf_internal.h"
 #include "src/emulation/test_emu.h"
 #include "lvgl.h"
 #include "lvgl/src/others/test/lv_test_display.h"
@@ -14,8 +15,9 @@
 /*=======External Functions This Runner Calls=====*/
 extern void setUp(void);
 extern void tearDown(void);
-extern void test_testscreen(void);
-extern void test_monkey_random_input(void);
+extern void test_btns_created(void);
+extern void test_btns_named(void);
+extern void test_btns_events(void);
 
 
 /*=======Mock Management=====*/
@@ -77,8 +79,9 @@ static void run_test(UnityTestFunction func, const char* name, UNITY_LINE_TYPE l
 int main(void)
 {
   UnityBegin("test_main.c");
-  run_test(test_testscreen, "test_testscreen", 105);
-  run_test(test_monkey_random_input, "test_monkey_random_input", 180);
+  run_test(test_btns_created, "test_btns_created", 96);
+  run_test(test_btns_named, "test_btns_named", 114);
+  run_test(test_btns_events, "test_btns_events", 128);
 
   return UnityEnd();
 }

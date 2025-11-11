@@ -31,7 +31,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define TEST 1
 
 /**********************
  *      TYPEDEFS
@@ -64,7 +63,7 @@ int main(int argc, char **argv)
   lv_init();
 
   /*Initialize the HAL (display, input devices, tick) for LVGL*/
-  sdl_hal_init(200, 350);
+  sdl_hal_init(800, 480);
 
   /* Run the default demo */
   /* To try a different demo or example, replace this with one of: */
@@ -75,7 +74,7 @@ int main(int argc, char **argv)
   /* lv_demo_widgets(); */
   /* lv_example_lottie_2(); */
   // lv_example_get_started_2_mod();
-  test_emulation_setup();
+  v_test_setup_emulation();
   
 
   while(1) {

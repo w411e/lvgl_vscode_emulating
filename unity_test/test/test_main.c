@@ -1,3 +1,6 @@
+#include "../../lvgl/src/lv_conf_internal.h"
+#if LV_USE_TEST
+
 #include "unity.h"
 #include "src/emulation/test_emu.h"
 #include "lvgl.h"
@@ -20,9 +23,10 @@
     #define REF_IMGS_PATH "A:/bin/screenshots"
 #endif
 
-#define BTNNUM 4
+// #define BTNNUM 4
 #define WAIT 30
 #define MONKEYTIME 20000 // ms time for monkeytest
+#define COLORMASK 0x00FFFFFF
 
 /* functions */
 void refresh_win_scr(void);
@@ -34,14 +38,9 @@ void timer_get_time(void);
 void timer_finish(void);
 
 /* External objects and screen */
-static lv_display_t * test_display;
-lv_obj_t *btn_arr[BTNNUM];
 lv_display_t* disp;
 lv_obj_t* scr;
-extern lv_obj_t* btn1;
-extern lv_obj_t* btn2;
-extern lv_obj_t* btn3;
-extern lv_obj_t* btn4;
+extern lv_obj_t* buttns[BTNNUM];
 
 /* Time header for textfile */
 bool timeHeader = false;
@@ -54,34 +53,35 @@ static uint32_t time_stamp = 0;
 uint32_t screenshot_cnt = 1; // amount of screencompares for naming
 char png_name [25] = {0}; // name of screenshot
 char name_template[] = "/screentest_"; // prefix
-lv_monkey_config_t mconfig;
-lv_monkey_t * monkey;
+volatile uint32_t color;
+bool setUpDone = false;
 
 
 /* Set up LVGL emulated environment */
 void setUp(void) 
 {
-    timer_start();
-    lv_init();
-    printf("\nsetUp begin...\n");
+    if(!setUpDone){
+        timer_start();
+        lv_init();
+        printf("\nsetUp begin...\n");
 
-    /* Create an in-memory display for testing */
-    // disp = lv_sdl_window_create(480, 320); // width x height
-    disp = lv_test_display_create(480, 320);
-    lv_display_set_default(disp);
-    lv_display_set_color_format(disp, LV_COLOR_FORMAT_XRGB8888);
-    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_PARTIAL);
-    lv_display_set_antialiasing(disp, false);
-    lv_display_flush_ready(disp);
-    
-    /* Create test input devices: pointer, keypad, encoder */
-    lv_test_indev_create_all();
-    scr = lv_screen_active();
-    lv_obj_invalidate(scr);
-    /* Initialize your UI */
-    test_emulation_setup();
+        /* Create an in-memory display for testing */
+        disp = lv_test_display_create(480, 320);
+        lv_display_set_default(disp);
+        lv_display_set_color_format(disp, LV_COLOR_FORMAT_XRGB8888);
+        lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_PARTIAL);
+        lv_display_set_antialiasing(disp, false);
+        lv_display_flush_ready(disp);
+        
+        /* Create test input devices: pointer, keypad, encoder */
+        lv_test_indev_create_all();
+        scr = lv_screen_active();
+        lv_obj_invalidate(scr);
+        v_test_setup_emulation();
 
-    printf("setUp finished...\n");
+        setUpDone = true;
+        printf("setUp finished...\n");
+    }
 }
 
 /* Tear down LVGL environment */
@@ -93,114 +93,68 @@ void tearDown(void)
 }
 
 /* Test button creation */
-void test_testscreen(void) 
+void test_btns_created(void) 
 {
-    bool result; // screenshot compare
-
     printf("test_testscreen begin...\n");
-    btn_arr[0] = btn1;
-    btn_arr[1] = btn2;
-    btn_arr[2] = btn3;
-    btn_arr[3] = btn4;
 
     for(int i = 0; i < BTNNUM; i++)
     {
-        btn_arr[i] = lv_obj_get_child(scr, i);
+        buttns[i] = lv_obj_get_child(scr, i);
     }
-
     refresh_win_scr();
-
     printf("\n--------------------------------------------\n");
     printf("Buttons created test:\n");
     for(int i = 0; i < BTNNUM; i++)
     {
-        TEST_ASSERT_NOT_NULL(btn_arr[i]);
+        TEST_ASSERT_NOT_NULL(buttns[i]);
         printf("Button btn_%d:\t\t\t\tPASS\n", i+1);
-
-        /* Screenshot compare block start */
-        run_screenshot_compare();
-        /* Screenshot compare block end */
     }
     timer_get_time();
-
+}
+void test_btns_named(void)
+{
     printf("\n--------------------------------------------\n");
-    printf("Button label test:\n");
+    printf("Button name test:\n");
     refresh_win_scr();
     for(int i = 0; i < BTNNUM; i++)
     {
         char btn_name[6] = "\0";
         lv_snprintf(btn_name, sizeof(btn_name), "btn_%d", i+1);
-        TEST_ASSERT_EQUAL_STRING(btn_name, lv_obj_get_name(btn_arr[i]));
+        TEST_ASSERT_EQUAL_STRING(btn_name, lv_obj_get_name(buttns[i]));
         printf("Label btn_%d:\t\t\t\tPASS\n", i+1);
-
-        /* Screenshot compare block start */
-        run_screenshot_compare();
-        /* Screenshot compare block end */
     }
     timer_get_time();
-
+}
+void test_btns_events(void)
+{
     printf("\n--------------------------------------------\n");
     printf("Button event tests:\n");
     for(int i = 0; i < BTNNUM; i++)
     {
-        lv_obj_send_event(btn_arr[i], LV_EVENT_PRESSED, NULL);
+        /* test default state */
         refresh_win_scr();
-        
-        uint32_t color = lv_color_to_u32(lv_obj_get_style_bg_color(btn_arr[i], LV_PART_MAIN)) & 0x00FFFFFF;
-        TEST_ASSERT_EQUAL_HEX32(0xFF0000, color); // RED
-        printf("Event PRESSED, clr RED btn_%d:\t\tPASS\n", i+1);
-
-        /* Screenshot compare block start */
+        color = lv_color_to_u32(lv_obj_get_style_bg_color(buttns[i], LV_PART_MAIN)) & COLORMASK;
+        TEST_ASSERT_EQUAL_HEX32(V_CLR_WHITE, color); // V_CLR_WHITE
+        printf("Event DEFAULT, clr V_CLR_WHITE btn_%d:\t\tPASS\n", i+1);
         run_screenshot_compare();
-        /* Screenshot compare block end */
 
-        lv_obj_send_event(btn_arr[i], LV_EVENT_RELEASED, NULL);
+        /* test event active state */
+        lv_obj_send_event(buttns[i], LV_EVENT_PRESSED, NULL);
         refresh_win_scr();
-
-        color = lv_color_to_u32(lv_obj_get_style_bg_color(btn_arr[i], LV_PART_MAIN)) & 0x00FFFFFF;
-        TEST_ASSERT_EQUAL_HEX32(0xFFFFFF, color); // WHITE
-        printf("Event RELEASED, clr WHITE btn_%d:\tPASS\n", i+1);
-
-        /* Screenshot compare block start */
+        color = lv_color_to_u32(lv_obj_get_style_bg_color(buttns[i], LV_PART_MAIN)) & COLORMASK;
+        TEST_ASSERT_EQUAL_HEX32(V_CLR_RED, color); // V_CLR_RED
+        printf("Event PRESSED, clr V_CLR_RED btn_%d:\t\tPASS\n", i+1);
         run_screenshot_compare();
-        /* Screenshot compare block end */
+
+        /* test return to default state */
+        lv_obj_send_event(buttns[i], LV_EVENT_RELEASED, NULL);
+        refresh_win_scr();
+        color = lv_color_to_u32(lv_obj_get_style_bg_color(buttns[i], LV_PART_MAIN)) & COLORMASK;
+        TEST_ASSERT_EQUAL_HEX32(V_CLR_WHITE, color); // V_CLR_WHITE
+        printf("Event RELEASED, clr V_CLR_WHITE btn_%d:\tPASS\n", i+1);
+        run_screenshot_compare();
     }
     timer_get_time();
-}
-
-void test_monkey_random_input(void)
-{
-    TEST_IGNORE();
-    printf("Starting Monkey Random Interaction Test...\n");
-    
-    /* Monkeytest setup */
-    lv_monkey_config_init(&mconfig);
-    mconfig.type = LV_INDEV_TYPE_POINTER;
-    mconfig.period_range.min = 0;
-    mconfig.period_range.max = 20;
-    mconfig.input_range.min = 0;
-    mconfig.input_range.max = 320;
-    monkey = lv_monkey_create(&mconfig);
-    lv_monkey_set_enable(monkey, true);
-    refresh_win_scr();
-
-    uint32_t end = lv_tick_get() + MONKEYTIME; // 3 seconds
-    uint32_t scr_shot_time = 0;
-    while(lv_tick_get() < end) {
-        lv_timer_handler();
-        lv_test_wait(10);
-        if (scr_shot_time == 500){
-            scr_shot_time = 0;
-            run_screenshot_compare();
-        }
-        scr_shot_time+=10;
-    }
-
-    /* Screenshot compare block start */
-    run_screenshot_compare();
-    /* Screenshot compare block end */
-
-    printf("Monkey interaction done.\n");
 }
 
 void refresh_win_scr(void)
@@ -278,3 +232,5 @@ void timer_finish(void)
      * Maybe future use
      */
 }
+
+#endif
