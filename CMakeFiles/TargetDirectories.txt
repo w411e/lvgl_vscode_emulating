@@ -1,5 +1,5 @@
-C:/northh/repos/lvgl_vscode/CMakeFiles/run.dir
-C:/northh/repos/lvgl_vscode/CMakeFiles/main.dir
+C:/northh/repos/lvgl_vscode/CMakeFiles/run_test.dir
+C:/northh/repos/lvgl_vscode/CMakeFiles/test_ui.dir
 C:/northh/repos/lvgl_vscode/CMakeFiles/edit_cache.dir
 C:/northh/repos/lvgl_vscode/CMakeFiles/rebuild_cache.dir
 C:/northh/repos/lvgl_vscode/CMakeFiles/list_install_components.dir

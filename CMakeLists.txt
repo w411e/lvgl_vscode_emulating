@@ -4,6 +4,17 @@ project(lvgl C CXX)
 # Set the correct FreeRTOS port for your system (e.g., Posix for WSL)
 set(FREERTOS_PORT GCC_POSIX CACHE STRING "Port for FreeRTOS on Posix environment")
 
+option(TEST "Build Unity test executable instead of normal app" OFF)
+# Unit testing with Unity
+if(TEST)
+    message(STATUS "Unity test is enabled")
+    add_definitions(-DTEST=1)
+else()
+    message(STATUS "Unity test is disabled")
+    add_definitions(-DTEST=0)
+endif()
+
+
 option(USE_FREERTOS "Enable FreeRTOS" OFF) # Turn this on to enable FreeRTOS
 
 if(USE_FREERTOS)
@@ -36,10 +47,15 @@ endif()
 # Main include files of the project
 include_directories(${PROJECT_SOURCE_DIR}/main/inc)
 
+# Disable LVGL demos/examples and ThorVG
+set(LVGL_BUILD_DEMOS OFF CACHE BOOL "Disable LVGL demos" FORCE)
+set(LVGL_BUILD_EXAMPLES OFF CACHE BOOL "Disable LVGL examples" FORCE)
+# set(LV_USE_TORVG OFF CACHE BOOL "Disable ThorVG" FORCE)
+
 # Define options for LVGL with default values (OFF)
 option(LV_USE_DRAW_SDL "Use SDL draw unit" OFF)
-option(LV_USE_LIBPNG "Use libpng to decode PNG" OFF)
-option(LV_USE_LIBJPEG_TURBO "Use libjpeg turbo to decode JPEG" OFF)
+option(LV_USE_LIBPNG "Use libpng to decode PNG" ON)
+option(LV_USE_LIBJPEG_TURBO "Use libjpeg turbo to decode JPEG" ON)
 option(LV_USE_FFMPEG "Use libffmpeg to display video using lv_ffmpeg" OFF)
 option(LV_USE_FREETYPE "Use freetype library" OFF)
 
@@ -66,24 +82,59 @@ add_compile_definitions($<$<BOOL:${LV_USE_FFMPEG}>:LV_USE_FFMPEG=1>)
 add_subdirectory(lvgl)
 target_include_directories(lvgl PUBLIC ${PROJECT_SOURCE_DIR} ${SDL2_INCLUDE_DIRS})
 
-set(MAIN_SOURCES src/mouse_cursor_icon.c src/hal/hal.c src/testcode.c)
-set(MAIN_LIBS lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES})
+# Normal app sources
+set(MAIN_SOURCES 
+    src/mouse_cursor_icon.c 
+    src/hal/hal.c 
+    src/testcode.c
+    src/emulation/test_emu.c
+    src/emulation/test_emu_handlers.c
+)
+# Unity test sources
+set(TEST_SOURCES
+    unity_test/unity.c
+    unity_test/test/test_main.c
+    unity_test/test/test_main_Runner.c
+    src/emulation/test_emu.c
+    src/emulation/test_emu_handlers.c
+    # Optionally include your app sources if you want to test the UI code directly
+    src/mouse_cursor_icon.c
+    src/hal/hal.c
+    src/testcode.c
+    lvgl/src/others/test/lv_test_display.c
+    lvgl/src/others/test/lv_test_indev.c
+    lvgl/src/others/test/lv_test_screenshot_compare.c
+)
+# set(MAIN_LIBS lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES})
+# set(TEST_LIBS lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES})
+set(MAIN_LIBS lvgl lvgl::thorvg ${SDL2_LIBRARIES})
+set(TEST_LIBS lvgl lvgl::thorvg ${SDL2_LIBRARIES})
 
 # Create the main executable, depending on the FreeRTOS option
 if(USE_FREERTOS)
     list(APPEND MAIN_SOURCES src/freertos_main.c src/freertos/freertos_posix_port.c ${FREERTOS_SOURCES})
     list(APPEND MAIN_LIBS freertos_config freertos_kernel)
+    list(APPEND TEST_LIBS freertos_config freertos_kernel)
 else()
     list(APPEND MAIN_SOURCES src/main.c)
+    list(APPEND TEST_SOURCES src/main.c)
 endif()
 
 
 if(NOT MSVC)
     list(APPEND MAIN_LIBS m pthread)
+    list(APPEND TEST_LIBS m pthread)
 endif()
 
 # Custom target to run the executable
-add_custom_target(run COMMAND ${EXECUTABLE_OUTPUT_PATH}/main DEPENDS main)
+# add_custom_target(run COMMAND ${EXECUTABLE_OUTPUT_PATH}/main DEPENDS main)
+
+if(TEST)
+    add_custom_target(run_test COMMAND ${EXECUTABLE_OUTPUT_PATH}/test_ui DEPENDS test_ui)
+else()
+    add_custom_target(run COMMAND ${EXECUTABLE_OUTPUT_PATH}/main DEPENDS main)
+endif()
+
 
 # Conditionally include and link SDL2_image if LV_USE_DRAW_SDL is enabled
 # if(LV_USE_DRAW_SDL)
@@ -102,15 +153,26 @@ if(LV_USE_DRAW_SDL)
     find_package(SDL2_image REQUIRED)
     target_include_directories(lvgl PUBLIC ${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
     list(APPEND MAIN_LIBS ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
+    list(APPEND TEST_LIBS ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
 endif()
 
 
 
 # Conditionally include and link libpng if LV_USE_LIBPNG is enabled
 if(LV_USE_LIBPNG)
+    # Ensure vcpkg toolchain file is used (if not already)
+    if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+        set(CMAKE_TOOLCHAIN_FILE "C:/northh/repos/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+    endif()
     find_package(PNG REQUIRED)
-    target_include_directories(lvgl PUBLIC ${PNG_INCLUDE_DIRS})
-    list(APPEND MAIN_LIBS ${PNG_LIBRARIES})
+    if(PNG_FOUND)
+        message(STATUS "libpng found: ${PNG_LIBRARIES}")
+        target_include_directories(lvgl PUBLIC ${PNG_INCLUDE_DIRS})
+        list(APPEND MAIN_LIBS ${PNG_LIBRARIES})
+        list(APPEND TEST_LIBS ${PNG_LIBRARIES})
+    else()
+        message(FATAL_ERROR "libpng not found!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    endif()
 endif()
 
 # Conditionally include and link libjpeg-turbo if LV_USE_LIBJPEG_TURBO is enabled
@@ -118,11 +180,13 @@ if(LV_USE_LIBJPEG_TURBO)
     find_package(JPEG REQUIRED)
     target_include_directories(lvgl PUBLIC ${JPEG_INCLUDE_DIRS})
     list(APPEND MAIN_LIBS ${JPEG_LIBRARIES})
+    list(APPEND TEST_LIBS ${JPEG_LIBRARIES})
 endif()
 
 # Conditionally include and link FFmpeg libraries if LV_USE_FFMPEG is enabled
 if(LV_USE_FFMPEG)
     list(APPEND MAIN_LIBS avformat avcodec avutil swscale z)
+    list(APPEND TEST_LIBS avformat avcodec avutil swscale z)
 endif()
 
 # Conditionally include and link FreeType if LV_USE_FREETYPE is enabled
@@ -130,19 +194,41 @@ if(LV_USE_FREETYPE)
     find_package(Freetype REQUIRED)
     target_include_directories(lvgl PUBLIC ${FREETYPE_INCLUDE_DIRS})
     list(APPEND MAIN_LIBS ${FREETYPE_LIBRARIES})
+    list(APPEND TEST_LIBS ${FREETYPE_LIBRARIES})
 endif()
 
-add_executable(main ${MAIN_SOURCES})
-target_compile_definitions(main PRIVATE LV_CONF_INCLUDE_SIMPLE)
-target_link_libraries(main ${MAIN_LIBS})
+# add_executable(main ${MAIN_SOURCES})
+# target_compile_definitions(main PRIVATE LV_CONF_INCLUDE_SIMPLE)
+# target_link_libraries(main ${MAIN_LIBS})
+
+if(TEST)
+    add_executable(test_ui ${TEST_SOURCES})
+    target_include_directories(test_ui PRIVATE lvgl src unity_test unity_test/test)
+
+    # Link SDL2 (without SDL2main!)
+    target_link_libraries(test_ui ${TEST_LIBS})
+    # target_link_libraries(test_ui ${MAIN_LIBS})
+else()
+    add_executable(main ${MAIN_SOURCES})
+    target_compile_definitions(main PRIVATE LV_CONF_INCLUDE_SIMPLE)
+    target_link_libraries(main ${MAIN_LIBS})
+endif()
 
 # On Windows, GUI applications do not show a console by default,
 # which hides log output. This ensures a console is available for logging.
 if (WIN32)
     if (MSVC)
-        target_link_options(main PRIVATE "/SUBSYSTEM:CONSOLE")
+        if (TEST)
+            target_link_options(test_ui PRIVATE "/SUBSYSTEM:CONSOLE")
+        else()
+            target_link_options(main PRIVATE "/SUBSYSTEM:CONSOLE")
+        endif()
     else()
-        target_link_options(main PRIVATE "-mconsole")
+        if (TEST)
+            target_link_options(test_ui PRIVATE "-mconsole")
+        else()
+            target_link_options(main PRIVATE "-mconsole")
+        endif()
     endif()
 endif()
 

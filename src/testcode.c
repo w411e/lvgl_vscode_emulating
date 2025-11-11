@@ -58,21 +58,50 @@ static void btn_event_cb_sw_src(lv_event_t * e)
     }
 }
 
+void init_custom_style(lv_style_t * style){
+    lv_style_init(style);
+    lv_style_set_arc_rounded(style, false);
+    lv_style_set_bg_color(style, lv_color_hex(V_CLR_RED));
+    lv_style_set_outline_color(style, lv_color_hex(V_CLR_BLUE));
+    lv_style_set_shadow_width(style, 3);
+    lv_style_set_pad_all(style, 3);
+    lv_style_set_width(style, 100);
+    lv_style_set_height(style, 50);
+    lv_style_set_border_color(style, lv_color_hex(V_CLR_DEF_2));
+    lv_style_set_text_color(style, lv_color_hex(V_CLR_DEF));
+}
+
 /**
  * Create a button with a label and react on click event.
  */
 void lv_example_get_started_2_mod(void)
 {
-    // def screen
+    // def screen / setup with default
     lv_obj_t * screen_def = lv_screen_active(); // default screen, start
+    // def second screen / setup with custom style
     lv_obj_t * screen_2 = lv_obj_create(NULL);  // other screen, loaded via button
+    lv_style_t style_default;
+    // lv_obj_remove_style_all(screen_2); // remove all styles from second screen
+    lv_obj_set_style_layout(screen_2, LV_LAYOUT_FLEX, LV_PART_MAIN); // set flex flow not grid
+    lv_obj_set_style_flex_flow(screen_2, LV_FLEX_FLOW_ROW, LV_PART_MAIN); // set children in row
+    lv_obj_set_style_flex_grow(screen_2, 0, LV_PART_MAIN); // dont let grow
+    lv_obj_set_style_flex_main_place(screen_2, LV_FLEX_ALIGN_CENTER, LV_PART_MAIN); // flex placement alignment
+    //lv_obj_set_style_border_width(screen_2, 5, LV_PART_MAIN);
+    //lv_obj_set_style_border_color(screen_2, lv_color_hex(V_CLR_WHITE), LV_PART_MAIN);
+    // lv_obj_set_style_pad_all(screen_2, 5, LV_PART_MAIN); // set distance between widgets/screen
+    // lv_obj_set_style_text_color(screen_2, lv_color_hex(V_CLR_DEF), LV_PART_MAIN);
+    // lv_obj_set_style_text_outline_stroke_color(screen_2, lv_color_hex(V_CLR_DEF_2), LV_PART_MAIN);
+    // lv_obj_set_style_bg_color(screen_2, lv_color_hex(V_CLR_WHITE), LV_PART_MAIN);
+    init_custom_style(&style_default);
+    lv_obj_add_style(screen_2, &style_default, 0);
+
 
     // button 1
     lv_obj_t * btn1 = lv_button_create(lv_screen_active());     /*Add a button the current screen*/
     lv_obj_set_pos(btn1, 10, 10);                            /*Set its position*/
     lv_obj_set_size(btn1, 120, 50);                          /*Set its size*/
-    lv_obj_set_style_text_color(btn1, lv_color_hex(BLACK), LV_PART_MAIN);
-    lv_obj_set_style_border_color(btn1, lv_color_hex(YELLOW), LV_PART_MAIN);
+    lv_obj_set_style_text_color(btn1, lv_color_hex(V_CLR_BLACK), LV_PART_MAIN);
+    lv_obj_set_style_border_color(btn1, lv_color_hex(V_CLR_YELLOW), LV_PART_MAIN);
     lv_obj_set_style_border_width(btn1, 5, LV_PART_MAIN);
     static button b1;
     lv_strcpy(b1.buttonName, "Button_1");
@@ -96,37 +125,45 @@ void lv_example_get_started_2_mod(void)
 
     lv_obj_t *label2 = lv_label_create(btn2);
     lv_label_set_text(label2, b2.buttonName);
-    lv_obj_set_style_text_color(label2, lv_color_hex(MAGENTA), LV_PART_MAIN);
+    lv_obj_set_style_text_color(label2, lv_color_hex(V_CLR_MAGENTA), LV_PART_MAIN);
     lv_obj_center(label2);
 
     lv_obj_t *label2_1 = lv_label_create(lv_screen_active());
     lv_label_set_text(label2_1, "Button_2");
-    lv_obj_set_style_text_color(label2_1, lv_color_hex(FOREST), LV_PART_MAIN);
+    lv_obj_set_style_text_color(label2_1, lv_color_hex(V_CLR_FOREST), LV_PART_MAIN);
     lv_obj_align_to(label2_1, btn2, LV_ALIGN_OUT_BOTTOM_MID, 0, 5);
 
     // button 3
     lv_obj_t * btn3 = lv_button_create(lv_screen_active());
     lv_obj_set_pos(btn3, 10, 150);
     lv_obj_set_size(btn3, 160, 50);
-    lv_obj_set_style_bg_color(btn3, lv_color_hex(WHITE), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(btn3, lv_color_hex(V_CLR_WHITE), LV_PART_MAIN);
     lv_obj_add_event_cb(btn3, btn_event_cb_sw_src, LV_EVENT_ALL, NULL);
 
     lv_obj_t *label3 = lv_label_create(btn3);
     lv_label_set_text(label3, "Switch to Scr 2");
-    lv_obj_set_style_text_color(label3, lv_color_hex(GREEN), LV_PART_MAIN);
+    lv_obj_set_style_text_color(label3, lv_color_hex(V_CLR_GREEN), LV_PART_MAIN);
     lv_obj_center(label3);
 
     // button 4 (second screen)
     lv_obj_t * btn4 = lv_button_create(screen_2);
-    lv_obj_set_pos(btn4, 10, 150);
-    lv_obj_set_size(btn4, 120, 50);
-    lv_obj_set_style_bg_color(btn4, lv_color_hex(WHITE), LV_PART_MAIN);
+    //lv_obj_set_pos(btn4, 10, 150);
+    lv_obj_add_style(btn4, &style_default, 0);
     lv_obj_add_event_cb(btn4, btn_event_cb_sw_src, LV_EVENT_ALL, NULL);
 
+    lv_obj_t * btn5 = lv_button_create(screen_2);
+    lv_obj_add_style(btn5, &style_default, 0);
+    lv_obj_add_event_cb(btn5, btn_event_cb_mod, LV_EVENT_ALL, NULL);
+
+    lv_obj_t * btn6 = lv_button_create(screen_2);
+    lv_obj_add_style(btn6, &style_default, 0);
+    lv_obj_add_event_cb(btn6, btn_event_cb_mod, LV_EVENT_ALL, NULL);
+
     lv_obj_t *label4 = lv_label_create(btn4);
+    lv_obj_add_style(label4, &style_default, 0);
     lv_label_set_text(label4, "Switch to Scr 1");
-    lv_obj_set_style_text_color(label4, lv_color_hex(GREEN), LV_PART_MAIN);
-    lv_obj_center(label4);
+    //lv_obj_set_style_text_color(label4, lv_color_hex(V_CLR_GREEN), LV_PART_MAIN);
+    // lv_obj_center(label4);
 
     // button 3 to screen_2, button 4 to screen_def
     lv_obj_set_user_data(btn3, screen_2);
