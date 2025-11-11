@@ -15,4 +15,5 @@ The following list is not in priority-order. The goals are just a brainstorming,
 The different developed solutions will not have their own repos, but be available in the directories. The main function will have to be changed, to test every solution. If changes to the `CMakeLists.txt` or other files need to be done, I try to document it.
 
 ## current state
-TBD
+- **Simple Button Tests**: I created a very simple 4 button layout, to try out the unity and LVGL tests.
+- **Custom Main Menu**: I created a main menu with custom style and a little complexity. Tests need to be implemented. Deeper knowledge of styles and objects in LVGL acquired.
