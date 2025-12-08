@@ -15,4 +15,6 @@ The following list is not in priority-order. The goals are just a brainstorming,
 The different developed solutions will not have their own repos, but be available in the directories. The main function will have to be changed, to test every solution. If changes to the `CMakeLists.txt` or other files need to be done, I try to document it.
 
 ## current state
-TBD
+- Codestate: Emulated Main Screen done. Switched from C to C++ development.
+- Changes: Utilizing the languages strength tbd. Started to build classes and namespaces, need to be more narrowly defined for TDD. Fully stoped using #define's and instead started using the safer and more reliable constexpr. Advantage is no compiler or linker issues with this method, full typesafety.
+- Switching to private git after this push.
