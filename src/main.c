@@ -24,7 +24,8 @@
 #include "lvgl/demos/lv_demos.h"
 #include <SDL.h>
 #include "testcode.h"
-#include "src/emulation/test_emu.h"
+// #include "src/emulation/test_emu.h"
+#include "src/gui_main_screen/inc/main_screen_c_api.h"
 
 #include "hal/hal.h"
 
@@ -74,8 +75,9 @@ int main(int argc, char **argv)
   /* lv_demo_widgets(); */
   /* lv_example_lottie_2(); */
   // lv_example_get_started_2_mod();
-  v_test_setup_emulation();
-  
+  // v_test_setup_emulation();
+  // create and initialize GUI instance (keeps alive for program lifetime)
+  v_main_screen_gui_init();
 
   while(1) {
     /* Periodically call the lv_task handler.

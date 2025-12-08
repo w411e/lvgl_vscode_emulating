@@ -1,19 +1,24 @@
-cmake_minimum_required(VERSION 3.12.4)
+cmake_minimum_required(VERSION 3.14)
+cmake_policy(SET CMP0135 NEW)
+set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS TRUE)
+
 project(lvgl C CXX)
 
 # Set the correct FreeRTOS port for your system (e.g., Posix for WSL)
 set(FREERTOS_PORT GCC_POSIX CACHE STRING "Port for FreeRTOS on Posix environment")
 
-option(TEST "Build Unity test executable instead of normal app" OFF)
+# option(TEST "Build Unity test executable instead of normal app" OFF)
+option(UNIT_TEST_FLAG "Build GTest executable instead of normal app" ON)
 # Unit testing with Unity
-if(TEST)
-    message(STATUS "Unity test is enabled")
-    add_definitions(-DTEST=1)
+if(UNIT_TEST_FLAG)
+    # message(STATUS "Unity test is enabled")
+    message(STATUS "GTest is enabled")
+    add_definitions(-DUNIT_TEST_FLAG=1)
 else()
-    message(STATUS "Unity test is disabled")
-    add_definitions(-DTEST=0)
+    # message(STATUS "Unity test is disabled")
+    message(STATUS "GTest is disabled")
+    add_definitions(-DUNIT_TEST_FLAG=0)
 endif()
-
 
 option(USE_FREERTOS "Enable FreeRTOS" OFF) # Turn this on to enable FreeRTOS
 
@@ -43,6 +48,22 @@ else()
     message(STATUS "FreeRTOS is disabled")
     set(FREERTOS_SOURCES "")  # No FreeRTOS sources if FreeRTOS is disabled
 endif()
+
+# ----------------------------------------------------------------------------------------------
+if(UNIT_TEST_FLAG)
+    # googletest include, code from gtest official repository on github
+    include(FetchContent)
+    FetchContent_Declare(
+        googletest
+        # Specify the commit you depend on and update it regularly.
+        URL https://github.com/google/googletest/archive/5376968f6948923e2411081fd9372e71a59d8e77.zip
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    )
+    # For Windows: Prevent overriding the parent project's compiler/linker settings
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+endif()
+# ----------------------------------------------------------------------------------------------
 
 # Main include files of the project
 include_directories(${PROJECT_SOURCE_DIR}/main/inc)
@@ -81,34 +102,36 @@ add_compile_definitions($<$<BOOL:${LV_USE_FFMPEG}>:LV_USE_FFMPEG=1>)
 # Add LVGL subdirectory
 add_subdirectory(lvgl)
 target_include_directories(lvgl PUBLIC ${PROJECT_SOURCE_DIR} ${SDL2_INCLUDE_DIRS})
+# Add GUI subdirectories, added to libs list further down the code
+add_subdirectory(src/gui_main_screen)
 
 # Normal app sources
 set(MAIN_SOURCES 
     src/mouse_cursor_icon.c 
     src/hal/hal.c 
     src/testcode.c
-    src/emulation/test_emu.c
-    src/emulation/test_emu_handlers.c
 )
-# Unity test sources
+
+# Googletest test sources
 set(TEST_SOURCES
-    unity_test/unity.c
-    unity_test/test/test_main.c
-    unity_test/test/test_main_Runner.c
-    src/emulation/test_emu.c
-    src/emulation/test_emu_handlers.c
-    # Optionally include your app sources if you want to test the UI code directly
-    src/mouse_cursor_icon.c
-    src/hal/hal.c
+    src/mouse_cursor_icon.c 
+    src/hal/hal.c 
     src/testcode.c
+    # unity_test/unity.c
+    # unity_test/test/test_main.c
+    # unity_test/test/test_main_Runner.c
     lvgl/src/others/test/lv_test_display.c
     lvgl/src/others/test/lv_test_indev.c
     lvgl/src/others/test/lv_test_screenshot_compare.c
 )
+
 # set(MAIN_LIBS lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES})
 # set(TEST_LIBS lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES})
-set(MAIN_LIBS lvgl lvgl::thorvg ${SDL2_LIBRARIES})
-set(TEST_LIBS lvgl lvgl::thorvg ${SDL2_LIBRARIES})
+if(UNIT_TEST_FLAG)
+    set(TEST_LIBS lvgl lvgl::thorvg ${SDL2_LIBRARIES} gui_main_screen)
+else()
+    set(MAIN_LIBS lvgl lvgl::thorvg ${SDL2_LIBRARIES} gui_main_screen)
+endif()
 
 # Create the main executable, depending on the FreeRTOS option
 if(USE_FREERTOS)
@@ -120,31 +143,11 @@ else()
     list(APPEND TEST_SOURCES src/main.c)
 endif()
 
-
 if(NOT MSVC)
     list(APPEND MAIN_LIBS m pthread)
     list(APPEND TEST_LIBS m pthread)
 endif()
 
-# Custom target to run the executable
-# add_custom_target(run COMMAND ${EXECUTABLE_OUTPUT_PATH}/main DEPENDS main)
-
-if(TEST)
-    add_custom_target(run_test COMMAND ${EXECUTABLE_OUTPUT_PATH}/test_ui DEPENDS test_ui)
-else()
-    add_custom_target(run COMMAND ${EXECUTABLE_OUTPUT_PATH}/main DEPENDS main)
-endif()
-
-
-# Conditionally include and link SDL2_image if LV_USE_DRAW_SDL is enabled
-# if(LV_USE_DRAW_SDL)
-#     #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
-#     set(CMAKE_TOOLCHAIN_FILE "C:/northh/repos/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
-#     find_package(SDL2 CONFIG REQUIRED)
-#     find_package(SDL2_image CONFIG REQUIRED)
-#     target_include_directories(lvgl PUBLIC ${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
-#     list(APPEND MAIN_LIBS ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
-# endif()
 # Conditionally include and link SDL2_image if LV_USE_DRAW_SDL is enabled
 if(LV_USE_DRAW_SDL)
     set(CMAKE_TOOLCHAIN_FILE "C:/northh/repos/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain fil")
@@ -155,8 +158,6 @@ if(LV_USE_DRAW_SDL)
     list(APPEND MAIN_LIBS ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
     list(APPEND TEST_LIBS ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
 endif()
-
-
 
 # Conditionally include and link libpng if LV_USE_LIBPNG is enabled
 if(LV_USE_LIBPNG)
@@ -171,7 +172,7 @@ if(LV_USE_LIBPNG)
         list(APPEND MAIN_LIBS ${PNG_LIBRARIES})
         list(APPEND TEST_LIBS ${PNG_LIBRARIES})
     else()
-        message(FATAL_ERROR "libpng not found!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        message(FATAL_ERROR "libpng not found!")
     endif()
 endif()
 
@@ -197,17 +198,8 @@ if(LV_USE_FREETYPE)
     list(APPEND TEST_LIBS ${FREETYPE_LIBRARIES})
 endif()
 
-# add_executable(main ${MAIN_SOURCES})
-# target_compile_definitions(main PRIVATE LV_CONF_INCLUDE_SIMPLE)
-# target_link_libraries(main ${MAIN_LIBS})
-
-if(TEST)
-    add_executable(test_ui ${TEST_SOURCES})
-    target_include_directories(test_ui PRIVATE lvgl src unity_test unity_test/test)
-
-    # Link SDL2 (without SDL2main!)
-    target_link_libraries(test_ui ${TEST_LIBS})
-    # target_link_libraries(test_ui ${MAIN_LIBS})
+if(UNIT_TEST_FLAG)
+    # NOTHING, everything testrelated is in gtest_units/CMakeLists.txt
 else()
     add_executable(main ${MAIN_SOURCES})
     target_compile_definitions(main PRIVATE LV_CONF_INCLUDE_SIMPLE)
@@ -218,14 +210,14 @@ endif()
 # which hides log output. This ensures a console is available for logging.
 if (WIN32)
     if (MSVC)
-        if (TEST)
-            target_link_options(test_ui PRIVATE "/SUBSYSTEM:CONSOLE")
+        if (UNIT_TEST_FLAG)
+            # target_link_options(hello_test PRIVATE "/SUBSYSTEM:CONSOLE")
         else()
             target_link_options(main PRIVATE "/SUBSYSTEM:CONSOLE")
         endif()
     else()
-        if (TEST)
-            target_link_options(test_ui PRIVATE "-mconsole")
+        if (UNIT_TEST_FLAG)
+            # target_link_options(hello_test PRIVATE "-mconsole")
         else()
             target_link_options(main PRIVATE "-mconsole")
         endif()
@@ -273,4 +265,11 @@ if (ASAN)
 else()
     message(STATUS "AddressSanitizer disabled")
 endif()
+
+# RUN GTEST
+# Add GTest subdirectories
+if(UNIT_TEST_FLAG)
+    add_subdirectory(gtest_units)
+endif()
+
 endif()
